@@ -1,5 +1,3 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
 # dependencies
 node_modules/
 
@@ -7,7 +5,7 @@ node_modules/
 .expo/
 dist/
 web-build/
-expo-env.d.ts
+apps/mobile/expo-env.d.ts
 
 # Native
 .kotlin/
@@ -31,13 +29,19 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
 *.tsbuildinfo
 
-example
+# Vercel
+.vercel
+
+# Neon
+.neon/
 
 # generated native folders
-/ios
-/android
+apps/mobile/ios
+apps/mobile/android
+.neon

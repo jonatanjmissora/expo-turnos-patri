@@ -1,0 +1,13 @@
+{
+	"rewrites": [
+		{ "source": "/health", "destination": "/api/health" },
+		{ "source": "/register", "destination": "/api/auth/register" },
+		{ "source": "/login", "destination": "/api/auth/login" },
+		{ "source": "/logout", "destination": "/api/auth/logout" },
+		{ "source": "/me", "destination": "/api/auth/me" },
+		{ "source": "/sync/:entity", "destination": "/api/sync/:entity" }
+	],
+	"crons": [
+		{ "path": "/api/sync/turnos", "schedule": "0 3 * * 1" }
+	]
+}
