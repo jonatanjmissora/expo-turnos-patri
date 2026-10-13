@@ -1,4 +1,4 @@
--- Turnos Alba backend — schema Neon
+-- Turnos Patri backend — schema Neon
 -- Las tablas de identidad y `expo_turnos` también se crean de forma idempotente
 -- en `lib/db.ts` (`ensureSchema`). Este archivo queda como referencia / para
 -- ejecutar manualmente en Neon.
