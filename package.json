@@ -11,7 +11,7 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck"
   },
-  "packageManager": "pnpm@11.13.0",
+  "packageManager": "pnpm@11.28.5",
   "dependencies": {
     "@neon/config": "^1.8.6",
     "@neon/env": "^1.5.3"
