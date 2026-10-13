@@ -39,6 +39,7 @@ import {
 } from "@/services/form"
 import { getHeaderDay } from "@/services/header-day"
 import { ChipMultiSelect, ChipSelect } from "./ChipGroup"
+import { formatFieldErrors } from "./field-error"
 import { InputDuracion } from "./InputDuracion"
 import { InputHora } from "./InputHora"
 
@@ -100,6 +101,7 @@ export function TurnoForm({
 
 	const form = useForm({
 		defaultValues: initial,
+		validators: { onSubmit: turnoFormValidator },
 		onSubmit: async ({ value }) => {
 			if (!userId) {
 				setError("Sesión no válida")
@@ -215,10 +217,18 @@ export function TurnoForm({
 						<Text style={styles.label}>Hora</Text>
 						<form.Field name="hora">
 							{field => (
-								<InputHora
-									value={field.state.value}
-									onChange={field.handleChange}
-								/>
+								<View>
+									<InputHora
+										value={field.state.value}
+										onChange={field.handleChange}
+										onBlur={field.handleBlur}
+									/>
+									{!field.state.meta.isValid && (
+										<Text style={styles.fieldError}>
+											{formatFieldErrors(field.state.meta.errors)}
+										</Text>
+									)}
+								</View>
 							)}
 						</form.Field>
 					</View>
@@ -226,13 +236,21 @@ export function TurnoForm({
 						<Text style={styles.label}>Nombre</Text>
 						<form.Field name="nombre">
 							{field => (
-								<TextInput
-									value={field.state.value}
-									onChangeText={field.handleChange}
-									placeholder="nombre"
-									placeholderTextColor={colors.mutedLight}
-									style={styles.input}
-								/>
+								<View>
+									<TextInput
+										value={field.state.value}
+										onChangeText={field.handleChange}
+										onBlur={field.handleBlur}
+										placeholder="nombre"
+										placeholderTextColor={colors.mutedLight}
+										style={styles.input}
+									/>
+									{!field.state.meta.isValid && (
+										<Text style={styles.fieldError}>
+											{formatFieldErrors(field.state.meta.errors)}
+										</Text>
+									)}
+								</View>
 							)}
 						</form.Field>
 					</View>
@@ -243,13 +261,20 @@ export function TurnoForm({
 					<Text style={styles.label}>Tratamiento</Text>
 					<form.Field name="tratamiento">
 						{field => (
-							<ChipSelect
-								options={TRATAMIENTO_OPTIONS}
-								value={field.state.value}
-								onChange={value =>
-									field.handleChange(value as TratamientoOption)
-								}
-							/>
+							<View>
+								<ChipSelect
+									options={TRATAMIENTO_OPTIONS}
+									value={field.state.value}
+									onChange={value =>
+										field.handleChange(value as TratamientoOption)
+									}
+								/>
+								{!field.state.meta.isValid && (
+									<Text style={styles.fieldError}>
+										{formatFieldErrors(field.state.meta.errors)}
+									</Text>
+								)}
+							</View>
 						)}
 					</form.Field>
 				</View>
@@ -262,18 +287,25 @@ export function TurnoForm({
 								<Text style={styles.label}>Zonas de depilación</Text>
 								<form.Field name="depilacion">
 									{field => (
-										<ChipMultiSelect
-											options={DEPILACION_OPTIONS}
-											values={field.state.value}
-											onToggle={option => {
-												const current = field.state.value
-												field.handleChange(
-													current.includes(option)
-														? current.filter(item => item !== option)
-														: [...current, option]
-												)
-											}}
-										/>
+										<View>
+											<ChipMultiSelect
+												options={DEPILACION_OPTIONS}
+												values={field.state.value}
+												onToggle={option => {
+													const current = field.state.value
+													field.handleChange(
+														current.includes(option)
+															? current.filter(item => item !== option)
+															: [...current, option]
+													)
+												}}
+											/>
+											{!field.state.meta.isValid && (
+												<Text style={styles.fieldError}>
+													{formatFieldErrors(field.state.meta.errors)}
+												</Text>
+											)}
+										</View>
 									)}
 								</form.Field>
 							</View>
@@ -282,13 +314,21 @@ export function TurnoForm({
 								<Text style={styles.label}>Otro tratamiento</Text>
 								<form.Field name="otro">
 									{field => (
-										<TextInput
-											value={field.state.value}
-											onChangeText={field.handleChange}
-											placeholder="detalle"
-											placeholderTextColor={colors.mutedLight}
-											style={styles.input}
-										/>
+										<View>
+											<TextInput
+												value={field.state.value}
+												onChangeText={field.handleChange}
+												onBlur={field.handleBlur}
+												placeholder="detalle"
+												placeholderTextColor={colors.mutedLight}
+												style={styles.input}
+											/>
+											{!field.state.meta.isValid && (
+												<Text style={styles.fieldError}>
+													{formatFieldErrors(field.state.meta.errors)}
+												</Text>
+											)}
+										</View>
 									)}
 								</form.Field>
 							</View>
@@ -302,10 +342,17 @@ export function TurnoForm({
 						<Text style={styles.label}>Duración</Text>
 						<form.Field name="duracion">
 							{field => (
-								<InputDuracion
-									value={field.state.value}
-									onChange={field.handleChange}
-								/>
+								<View>
+									<InputDuracion
+										value={field.state.value}
+										onChange={field.handleChange}
+									/>
+									{!field.state.meta.isValid && (
+										<Text style={styles.fieldError}>
+											{formatFieldErrors(field.state.meta.errors)}
+										</Text>
+									)}
+								</View>
 							)}
 						</form.Field>
 					</View>
@@ -313,16 +360,24 @@ export function TurnoForm({
 						<Text style={styles.label}>Valor</Text>
 						<form.Field name="valor">
 							{field => (
-								<TextInput
-									value={field.state.value}
-									onChangeText={text =>
-										field.handleChange(text.replace(/\D/g, ""))
-									}
-									keyboardType="number-pad"
-									placeholder="valor"
-									placeholderTextColor={colors.mutedLight}
-									style={styles.input}
-								/>
+								<View>
+									<TextInput
+										value={field.state.value}
+										onChangeText={text =>
+											field.handleChange(text.replace(/\D/g, ""))
+										}
+										onBlur={field.handleBlur}
+										keyboardType="number-pad"
+										placeholder="valor"
+										placeholderTextColor={colors.mutedLight}
+										style={styles.input}
+									/>
+									{!field.state.meta.isValid && (
+										<Text style={styles.fieldError}>
+											{formatFieldErrors(field.state.meta.errors)}
+										</Text>
+									)}
+								</View>
 							)}
 						</form.Field>
 					</View>
@@ -399,6 +454,13 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.md,
 		fontWeight: "700",
 		color: colors.black,
+	},
+	fieldError: {
+		color: colors.danger,
+		fontSize: fontSize.xs,
+		fontStyle: "italic",
+		marginTop: spacing.xs,
+		textAlign: "center",
 	},
 	error: {
 		color: colors.danger,

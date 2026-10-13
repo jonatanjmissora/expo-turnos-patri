@@ -1,19 +1,19 @@
 {
   "expo": {
-    "name": "Turnos Alba",
-    "slug": "turnos-alba",
+    "name": "Turnos Patri",
+    "slug": "turnos-patri",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "turnosalba",
+    "scheme": "turnospatri",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.turnosalba.app",
+      "bundleIdentifier": "com.turnospatri.app",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.turnosalba.app",
+      "package": "com.turnospatri.app",
       "adaptiveIcon": {
         "backgroundColor": "#F9D9DE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

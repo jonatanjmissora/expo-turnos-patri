@@ -4,14 +4,22 @@ import { colors, fontSize, radius, spacing } from "@/constants/theme"
 type Props = {
 	value: string
 	onChange: (value: string) => void
+	onBlur?: () => void
 } & Pick<TextInputProps, "editable" | "placeholder">
 
 /** Input numérico de 4 dígitos para la hora (`HHMM`). */
-export function InputHora({ value, onChange, editable, placeholder }: Props) {
+export function InputHora({
+	value,
+	onChange,
+	onBlur,
+	editable,
+	placeholder,
+}: Props) {
 	return (
 		<TextInput
 			value={value}
 			onChangeText={text => onChange(text.replace(/\D/g, "").slice(0, 4))}
+			onBlur={onBlur}
 			keyboardType="number-pad"
 			maxLength={4}
 			editable={editable}

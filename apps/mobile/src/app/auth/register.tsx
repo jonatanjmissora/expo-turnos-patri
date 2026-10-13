@@ -1,3 +1,8 @@
+import { RegisterError, register } from "@/auth/auth.service"
+import { formatFieldErrors } from "@/components/form/field-error"
+import { colors, fontSize, radius, spacing } from "@/constants/theme"
+import { defaultRegister, registerFormValidator } from "@/db/schema/users"
+import { useSession } from "@/session/session-context"
 import { useForm } from "@tanstack/react-form"
 import { Link, useRouter } from "expo-router"
 import { useState } from "react"
@@ -9,10 +14,6 @@ import {
 	TextInput,
 	View,
 } from "react-native"
-import { RegisterError, register } from "@/auth/auth.service"
-import { defaultRegister, registerFormValidator } from "@/db/schema/users"
-import { colors, fontSize, radius, spacing } from "@/constants/theme"
-import { useSession } from "@/session/session-context"
 
 export default function RegisterScreen() {
 	const router = useRouter()
@@ -30,7 +31,9 @@ export default function RegisterScreen() {
 				const result = await register(value.email, value.password)
 				await setSession(result.user.id, result.token)
 				router.replace("/")
+				console.log("RESULT", JSON.stringify(result, null, 2))
 			} catch (e) {
+				console.log("ERROR", JSON.stringify(e, null, 2))
 				setError(
 					e instanceof RegisterError
 						? e.message
@@ -54,42 +57,65 @@ export default function RegisterScreen() {
 
 				<form.Field name="email">
 					{field => (
-						<TextInput
-							value={field.state.value}
-							onChangeText={field.handleChange}
-							autoCapitalize="none"
-							autoCorrect={false}
-							keyboardType="email-address"
-							placeholder="mail"
-							placeholderTextColor={colors.mutedLight}
-							style={styles.input}
-						/>
+						<View>
+							<TextInput
+								selectTextOnFocus
+								value={field.state.value}
+								onChangeText={field.handleChange}
+								onBlur={field.handleBlur}
+								autoCapitalize="none"
+								autoCorrect={false}
+								keyboardType="email-address"
+								placeholder="mail"
+								placeholderTextColor={colors.mutedLight}
+								style={styles.input}
+							/>
+							{!field.state.meta.isValid && (
+								<Text style={styles.fieldError}>
+									{formatFieldErrors(field.state.meta.errors)}
+								</Text>
+							)}
+						</View>
 					)}
 				</form.Field>
 
 				<form.Field name="password">
 					{field => (
-						<TextInput
-							value={field.state.value}
-							onChangeText={field.handleChange}
-							secureTextEntry
-							placeholder="contraseña"
-							placeholderTextColor={colors.mutedLight}
-							style={styles.input}
-						/>
+						<View>
+							<TextInput
+								value={field.state.value}
+								onChangeText={field.handleChange}
+								onBlur={field.handleBlur}
+								placeholder="contraseña"
+								placeholderTextColor={colors.mutedLight}
+								style={styles.input}
+							/>
+							{!field.state.meta.isValid && (
+								<Text style={styles.fieldError}>
+									{formatFieldErrors(field.state.meta.errors)}
+								</Text>
+							)}
+						</View>
 					)}
 				</form.Field>
 
 				<form.Field name="confirmPassword">
 					{field => (
-						<TextInput
-							value={field.state.value}
-							onChangeText={field.handleChange}
-							secureTextEntry
-							placeholder="repetir contraseña"
-							placeholderTextColor={colors.mutedLight}
-							style={styles.input}
-						/>
+						<View>
+							<TextInput
+								value={field.state.value}
+								onChangeText={field.handleChange}
+								onBlur={field.handleBlur}
+								placeholder="repetir contraseña"
+								placeholderTextColor={colors.mutedLight}
+								style={styles.input}
+							/>
+							{!field.state.meta.isValid && (
+								<Text style={styles.fieldError}>
+									{formatFieldErrors(field.state.meta.errors)}
+								</Text>
+							)}
+						</View>
 					)}
 				</form.Field>
 
@@ -155,6 +181,13 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.md,
 		fontWeight: "700",
 		color: colors.black,
+	},
+	fieldError: {
+		color: colors.danger,
+		fontSize: fontSize.xs,
+		fontStyle: "italic",
+		marginTop: spacing.xs,
+		textAlign: "center",
 	},
 	error: {
 		color: colors.danger,

@@ -34,6 +34,13 @@ Run lint and typecheck before declaring any task done.
 Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
 Docs: https://docs.expo.dev/eas/index.md
 
+## Standards & patterns (nuestros)
+
+- Estructura del proyecto y convenciones: seguir el skill **`expo-standards`**.
+- **Formularios**: SIEMPRE `@tanstack/react-form` (`useForm`). Seguir **`tanstack-form-patterns`** (validators `onSubmit`, error por campo con `!field.state.meta.isValid`; los mensajes aparecen al enviar). Nunca `useState`/`FormData` para el estado del formulario.
+- Datos: **`expo-ts-query-patterns`** (queries/mutations) + **`react-native-patterns`** (SQLite/repository).
+- Auth: **`expo-usuario`**. Sync: **`expo-sync-local`**.
+
 ## Rules
 
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.

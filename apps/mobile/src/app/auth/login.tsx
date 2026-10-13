@@ -1,3 +1,8 @@
+import { LoginError, login } from "@/auth/auth.service"
+import { formatFieldErrors } from "@/components/form/field-error"
+import { colors, fontSize, radius, spacing } from "@/constants/theme"
+import { defaultLogin, loginFormValidator } from "@/db/schema/users"
+import { useSession } from "@/session/session-context"
 import { useForm } from "@tanstack/react-form"
 import { Link, useRouter } from "expo-router"
 import { useState } from "react"
@@ -11,10 +16,6 @@ import {
 	TextInput,
 	View,
 } from "react-native"
-import { colors, fontSize, radius, spacing } from "@/constants/theme"
-import { LoginError, login } from "@/auth/auth.service"
-import { defaultLogin, loginFormValidator } from "@/db/schema/users"
-import { useSession } from "@/session/session-context"
 
 export default function LoginScreen() {
 	const router = useRouter()
@@ -58,29 +59,46 @@ export default function LoginScreen() {
 
 				<form.Field name="email">
 					{field => (
-						<TextInput
-							value={field.state.value}
-							onChangeText={field.handleChange}
-							autoCapitalize="none"
-							autoCorrect={false}
-							keyboardType="email-address"
-							placeholder="mail"
-							placeholderTextColor={colors.mutedLight}
-							style={styles.input}
-						/>
+						<View>
+							<TextInput
+								selectTextOnFocus
+								value={field.state.value}
+								onChangeText={field.handleChange}
+								onBlur={field.handleBlur}
+								autoCapitalize="none"
+								autoCorrect={false}
+								keyboardType="email-address"
+								placeholder="mail"
+								placeholderTextColor={colors.mutedLight}
+								style={styles.input}
+							/>
+							{!field.state.meta.isValid && (
+								<Text style={styles.fieldError}>
+									{formatFieldErrors(field.state.meta.errors)}
+								</Text>
+							)}
+						</View>
 					)}
 				</form.Field>
 
 				<form.Field name="password">
 					{field => (
-						<TextInput
-							value={field.state.value}
-							onChangeText={field.handleChange}
-							secureTextEntry
-							placeholder="contraseña"
-							placeholderTextColor={colors.mutedLight}
-							style={styles.input}
-						/>
+						<View>
+							<TextInput
+								value={field.state.value}
+								onChangeText={field.handleChange}
+								onBlur={field.handleBlur}
+								secureTextEntry
+								placeholder="contraseña"
+								placeholderTextColor={colors.mutedLight}
+								style={styles.input}
+							/>
+							{!field.state.meta.isValid && (
+								<Text style={styles.fieldError}>
+									{formatFieldErrors(field.state.meta.errors)}
+								</Text>
+							)}
+						</View>
 					)}
 				</form.Field>
 
@@ -143,6 +161,13 @@ const styles = StyleSheet.create({
 		fontSize: fontSize.md,
 		fontWeight: "700",
 		color: colors.black,
+	},
+	fieldError: {
+		color: colors.danger,
+		fontSize: fontSize.xs,
+		fontStyle: "italic",
+		marginTop: spacing.xs,
+		textAlign: "center",
 	},
 	error: {
 		color: colors.danger,

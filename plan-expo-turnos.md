@@ -204,7 +204,7 @@ CREATE INDEX IF NOT EXISTS idx_expo_turnos_user ON expo_turnos (user_id);
 3. Biome (`biome check`) en mobile y api, como en `expo-enhysa`.
 4. Base del backend en `apps/api`: `package.json` (`@neondatabase/serverless`, `@vercel/node`),
    `vercel.json`, `apps/api/.env` (`DATABASE_URL`, `API_TOKEN`, `CRON_SECRET`).
-5. `app.json` (name `Turnos Alba`, slug, iconos/splash desde `src/assets/logo.svg`),
+5. `app.json` (name `Turnos Patri`, slug, iconos/splash desde `src/assets/logo.svg`),
    `eas.json` con perfil `preview` (`distribution: internal`, `buildType: apk`).
 6. `apps/mobile/.env` con `EXPO_PUBLIC_API_URL` y `EXPO_PUBLIC_API_TOKEN`.
 
@@ -215,7 +215,7 @@ CREATE INDEX IF NOT EXISTS idx_expo_turnos_user ON expo_turnos (user_id);
 ## 6. Etapa 1 — Usuario: alta, login y sesión (hito 0)
 
 > Reutiliza el patrón de `plan-user.md` de `expo-enhysa`. **Sin** identidad demo `user-1`
-> (a diferencia de EnHySa): en Turnos Alba el acceso requiere cuenta, como en la web.
+> (a diferencia de EnHySa): en Turnos Patri el acceso requiere cuenta, como en la web.
 > Se conserva el **login offline** (verificar contra el hash local) para que la app siga
 > funcionando sin conexión después del primer ingreso.
 
