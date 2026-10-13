@@ -1,17 +1,12 @@
 import { useSyncExternalStore } from "react"
 
-export type SyncActivitySection = {
-	key: string
-	label: string
-	done: number
-}
-
-type SyncActivityState = {
+export type SyncActivityState = {
 	active: boolean
-	sections: SyncActivitySection[]
+	done: number
+	total: number
 }
 
-let state: SyncActivityState = { active: false, sections: [] }
+let state: SyncActivityState = { active: false, done: 0, total: 0 }
 const listeners = new Set<() => void>()
 
 function emit() {
@@ -29,21 +24,14 @@ function getSnapshot(): SyncActivityState {
 	return state
 }
 
-export function startSyncActivity(sections: { key: string; label: string }[]) {
-	state = {
-		active: true,
-		sections: sections.map(section => ({ ...section, done: 0 })),
-	}
+/** Inicia la actividad de sync con el total de operaciones a enviar. */
+export function startSyncActivity(total: number) {
+	state = { active: true, done: 0, total }
 	emit()
 }
 
-export function setSectionProgress(key: string, done: number) {
-	state = {
-		...state,
-		sections: state.sections.map(section =>
-			section.key === key ? { ...section, done } : section
-		),
-	}
+export function setSyncProgress(done: number) {
+	state = { ...state, done }
 	emit()
 }
 

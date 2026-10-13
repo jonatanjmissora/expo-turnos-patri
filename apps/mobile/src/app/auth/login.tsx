@@ -54,7 +54,7 @@ export default function LoginScreen() {
 			behavior={Platform.OS === "ios" ? "padding" : undefined}
 		>
 			<View style={styles.card}>
-				<Text style={styles.brand}>Turnos Alba</Text>
+				<Text style={styles.brand}>Turnos Patri</Text>
 				<Text style={styles.subtitle}>Ingresá a tu cuenta</Text>
 
 				<form.Field name="email">

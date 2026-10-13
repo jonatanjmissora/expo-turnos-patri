@@ -1,8 +1,8 @@
-# Plan: migrar `turnos-alba` a Expo (React Native) — local-first + sync Neon
+# Plan: migrar `turnos-patri` a Expo (React Native) — local-first + sync Neon
 
 ## Objetivo
 
-Portar la web `react-turnos-alba` (Vite + React + Supabase) a una app **Expo / React Native**,
+Portar la web `react-turnos-patri` (Vite + React + Supabase) a una app **Expo / React Native**,
 **local-first**, con **alta de usuario** y **sincronización con Neon**, reutilizando los patrones
 ya probados en `expo-enhysa` + `expo-enhysa-backend`.
 
@@ -17,7 +17,7 @@ alta/edición de turnos con detección de solapamiento, listado de clientas con 
 |------|----------|
 | Repositorios | **Monorepo único** (app + backend en un solo repo). |
 | Backend / auth | **Auth custom** (register/login + hash + token de sesión) como `expo-enhysa-backend`. Neon solo como Postgres. |
-| Ubicación del plan | Este repo (`react-turnos-alba`), archivo `plan-expo-turnos.md`. |
+| Ubicación del plan | Este repo (`react-turnos-patri`), archivo `plan-expo-turnos.md`. |
 | Datos existentes | **Empezar limpio**: no se migra el historial de Supabase. |
 | Fuente de patrones | `expo-enhysa` (app) y `expo-enhysa-backend` (API + Neon). |
 | Skills a usar en ejecución | `expo-overview`, `expo-router`, `expo-native-ui`, `react-native-patterns`, `expo-ts-query-patterns`, `expo-sync-local`, `better-auth-patterns` (solo referencia), `expo-eas-apk`. |
@@ -48,10 +48,10 @@ alta/edición de turnos con detección de solapamiento, listado de clientas con 
 
 ## 2. Estructura del monorepo
 
-Repo nuevo `expo-turnos-alba/` (pnpm workspace):
+Repo nuevo `expo-turnos-patri/` (pnpm workspace):
 
 ```
-expo-turnos-alba/
+expo-turnos-patri/
 ├── pnpm-workspace.yaml
 ├── plan-expo-turnos.md
 ├── apps/

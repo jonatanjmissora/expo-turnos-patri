@@ -27,6 +27,8 @@ export function SyncBootstrap() {
 					await runRestoreFlow(userId)
 					if (!active) return
 					await setRestoreChecked()
+					// El restore puede haber insertado datos en SQLite: refrescamos.
+					await queryClient.invalidateQueries()
 				}
 
 				const result = await flushAll(userId, { notify: true })

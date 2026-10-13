@@ -81,7 +81,9 @@ export const syncLocalRepository = {
 		if (!entity) return
 
 		const db = await getDatabase()
+		const hasCreatedAt = entity.hasCreatedAt === true
 		const colNames = ["id", "userId", ...entity.columns, "updatedAt"]
+		if (hasCreatedAt) colNames.push("createdAt")
 		const placeholders = colNames.map(() => "?").join(", ")
 
 		await db.withTransactionAsync(async () => {
@@ -93,17 +95,21 @@ export const syncLocalRepository = {
 			}
 
 			for (const item of items) {
-				const values = [
-					item.id as string,
-					userId,
-					...entity.columns.map(column => {
-						if (isBooleanField(entity, column)) {
-							return item[column] ? 1 : 0
-						}
-						return (item[column] ?? null) as string | number | null
-					}),
-					item.updatedAt as string,
-				]
+				const values: (string | number | null)[] = [item.id as string, userId]
+				for (const column of entity.columns) {
+					if (isBooleanField(entity, column)) {
+						values.push(item[column] ? 1 : 0)
+					} else {
+						values.push((item[column] ?? null) as string | number | null)
+					}
+				}
+				values.push(item.updatedAt as string)
+				if (hasCreatedAt) {
+					values.push(
+						(item.createdAt as string | undefined) ?? (item.updatedAt as string)
+					)
+				}
+
 				await db.runAsync(
 					`INSERT OR REPLACE INTO ${entity.table} (${colNames.join(", ")}) VALUES (${placeholders})`,
 					...values

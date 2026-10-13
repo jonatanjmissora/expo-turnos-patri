@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons"
 import { Pressable, StyleSheet, Text, View } from "react-native"
+import { DevResetButton } from "@/components/dev/DevResetButton"
 import { colors, fontSize, radius, spacing } from "@/constants/theme"
 import { useSyncStatus } from "@/query/hooks/use-sync-status"
 import { useSession } from "@/session/session-context"
@@ -22,9 +23,12 @@ export function AppHeader({ title }: Props) {
 					</View>
 				) : null}
 			</View>
-			<Pressable onPress={signOut} hitSlop={10} style={styles.logout}>
-				<Feather name="log-out" size={22} color={colors.black} />
-			</Pressable>
+			<View style={styles.actions}>
+				<DevResetButton />
+				<Pressable onPress={signOut} hitSlop={10} style={styles.logout}>
+					<Feather name="log-out" size={22} color={colors.black} />
+				</Pressable>
+			</View>
 		</View>
 	)
 }
@@ -41,6 +45,11 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: spacing.sm,
+	},
+	actions: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: spacing.md,
 	},
 	title: {
 		fontSize: fontSize.lg,

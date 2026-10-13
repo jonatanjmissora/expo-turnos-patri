@@ -50,7 +50,7 @@ export default function RegisterScreen() {
 			keyboardShouldPersistTaps="handled"
 		>
 			<View style={styles.card}>
-				<Text style={styles.brand}>Turnos Alba</Text>
+				<Text style={styles.brand}>Turnos Patri</Text>
 				<Text style={styles.subtitle}>Creá tu cuenta</Text>
 
 				<form.Field name="email">

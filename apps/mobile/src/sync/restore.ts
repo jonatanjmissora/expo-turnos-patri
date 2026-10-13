@@ -6,6 +6,7 @@ import {
 	syncLocalRepository,
 } from "@/repositories/sync-local.repository"
 import { syncQueueRepository } from "@/repositories/sync-queue.repository"
+import { finishSyncActivity, startSyncActivity } from "./sync-activity"
 
 type CloudItem = Record<string, unknown> & { id: string; updatedAt: string }
 
@@ -36,6 +37,18 @@ function ask(
 async function clearQueue(userId: string): Promise<void> {
 	const entries = await syncQueueRepository.getAllByUserId(userId)
 	await syncQueueRepository.removeMany(entries.map(entry => entry.id))
+}
+
+/**
+ * Segunda verificación para acciones destructivas. Devuelve `true` solo si el
+ * usuario confirma explícitamente.
+ */
+async function confirmDestructive(message: string): Promise<boolean> {
+	const choice = await ask("Confirmar", message, [
+		{ text: "Cancelar", value: "cancel" },
+		{ text: "Sí, continuar", value: "confirm", destructive: true },
+	])
+	return choice === "confirm"
 }
 
 async function applyCloudAll(
@@ -137,8 +150,18 @@ async function mergeEntityLocally(
 /**
  * Restore/merge: se corre una vez por instalación, tras loguear. Decide el
  * estado global (4 combinaciones) y aplica la política elegida por el usuario.
+ * Muestra la barra de sync (indeterminada) mientras trae/aplica datos.
  */
 export async function runRestoreFlow(userId: string): Promise<void> {
+	startSyncActivity(0)
+	try {
+		await runRestoreFlowInner(userId)
+	} finally {
+		finishSyncActivity()
+	}
+}
+
+async function runRestoreFlowInner(userId: string): Promise<void> {
 	const cloud: CloudSnapshot = {}
 	let localTotal = 0
 	let cloudTotal = 0
@@ -160,45 +183,68 @@ export async function runRestoreFlow(userId: string): Promise<void> {
 		return
 	}
 
-	// Solo nube: elegir.
+	// Solo nube: elegir (con doble confirmación para "Empezar de cero").
 	if (localTotal === 0) {
-		const choice = await ask(
-			"Hay datos en la nube",
-			"¿Querés trabajar con los datos de la nube o empezar de cero?",
-			[
-				{ text: "Trabajar con la nube", value: "cloud" },
-				{ text: "Empezar de cero", value: "empty", destructive: true },
-			]
-		)
-		if (choice === "cloud") {
-			await applyCloudAll(userId, cloud, { replace: true })
-		} else {
-			await clearCloud(userId)
+		for (;;) {
+			const choice = await ask(
+				"Hay datos en la nube",
+				"¿Querés trabajar con los datos de la nube o empezar de cero?",
+				[
+					{ text: "Trabajar con la nube", value: "cloud" },
+					{ text: "Empezar de cero", value: "empty", destructive: true },
+				]
+			)
+
+			if (choice === "cloud") {
+				await applyCloudAll(userId, cloud, { replace: true })
+				return
+			}
+
+			const confirmed = await confirmDestructive(
+				"Empezar de cero eliminará TODOS los turnos guardados en la nube. Esta acción no se puede deshacer."
+			)
+			if (confirmed) {
+				await clearCloud(userId)
+				return
+			}
+			// Canceló: volvemos a preguntar.
 		}
-		return
 	}
 
 	// Ambos con datos: combinar / solo nube / solo local.
-	const choice = await ask(
-		"Hay datos locales y en la nube",
-		"¿Cómo querés combinarlos?",
-		[
-			{ text: "Combinar", value: "merge" },
-			{ text: "Solo nube", value: "cloud", destructive: true },
-			{ text: "Solo local", value: "local", destructive: true },
-		]
-	)
+	for (;;) {
+		const choice = await ask(
+			"Hay datos locales y en la nube",
+			"¿Cómo querés combinarlos?",
+			[
+				{ text: "Combinar", value: "merge" },
+				{ text: "Solo nube", value: "cloud", destructive: true },
+				{ text: "Solo local", value: "local", destructive: true },
+			]
+		)
 
-	if (choice === "cloud") {
-		await clearQueue(userId)
-		await applyCloudAll(userId, cloud, { replace: true })
-		return
-	}
+		if (choice === "merge") break
 
-	if (choice === "local") {
-		await clearCloud(userId)
-		await enqueueLocalAll(userId)
-		return
+		if (choice === "cloud") {
+			const confirmed = await confirmDestructive(
+				"Se descartarán los turnos guardados en este dispositivo. Esta acción no se puede deshacer."
+			)
+			if (confirmed) {
+				await clearQueue(userId)
+				await applyCloudAll(userId, cloud, { replace: true })
+				return
+			}
+			continue
+		}
+
+		const confirmed = await confirmDestructive(
+			"Se eliminarán TODOS los turnos guardados en la nube. Esta acción no se puede deshacer."
+		)
+		if (confirmed) {
+			await clearCloud(userId)
+			await enqueueLocalAll(userId)
+			return
+		}
 	}
 
 	// Combinar.

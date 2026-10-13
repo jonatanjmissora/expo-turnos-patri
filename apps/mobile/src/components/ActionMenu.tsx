@@ -1,6 +1,6 @@
 import { colors, fontSize, radius, spacing } from "@/constants/theme"
 import { Ionicons } from "@expo/vector-icons"
-import { type ReactNode, useState } from "react"
+import { type ComponentProps, type ReactNode, useState } from "react"
 import {
 	Modal,
 	Pressable,
@@ -11,7 +11,7 @@ import {
 
 export type ActionMenuAction = {
 	label: string
-	icon: keyof typeof Ionicons.glyphMap
+	icon: ComponentProps<typeof Ionicons>["name"]
 	onPress: () => void
 	/** Pinta la opción en rojo (acción destructiva). */
 	destructive?: boolean

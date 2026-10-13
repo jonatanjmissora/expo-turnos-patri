@@ -16,6 +16,11 @@ export type LocalEntity = {
 	numberFields: string[]
 	/** Columnas booleanas (local 0/1 ↔ nube true/false). */
 	booleanFields: string[]
+	/**
+	 * `true` si la tabla local tiene `createdAt NOT NULL` que la nube no envía:
+	 * al restaurar se rellena con `updatedAt` para no violar el constraint.
+	 */
+	hasCreatedAt?: boolean
 	label: string
 }
 
@@ -34,6 +39,7 @@ export const LOCAL_ENTITIES: LocalEntity[] = [
 		],
 		numberFields: ["duracion", "valor"],
 		booleanFields: ["isDepi"],
+		hasCreatedAt: true,
 		label: "turnos",
 	},
 ]

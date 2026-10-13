@@ -1,5 +1,5 @@
 /**
- * Tema de la app (paleta portada del CSS de `react-turnos-alba`).
+ * Tema de la app (paleta portada del CSS de `react-turnos-patri`).
  * Las variables CSS del repo web se mapean 1:1 a `colors`.
  */
 export const colors = {

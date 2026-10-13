@@ -1,12 +1,15 @@
 import { apiSyncPush } from "@/api/client"
 import { getLocalEntity, LOCAL_ENTITIES } from "@/db/local-entities"
-import { recordToCloud, syncLocalRepository } from "@/repositories/sync-local.repository"
+import {
+	recordToCloud,
+	syncLocalRepository,
+} from "@/repositories/sync-local.repository"
 import { syncQueueRepository } from "@/repositories/sync-queue.repository"
 import { showToast } from "@/ui/toast"
 import { isOffline } from "@/utils/network"
 import {
 	finishSyncActivity,
-	setSectionProgress,
+	setSyncProgress,
 	startSyncActivity,
 } from "./sync-activity"
 
@@ -17,6 +20,12 @@ export type SyncResult = {
 
 /** Lock por `userId:entity` para no correr dos flushes en paralelo. */
 const locks = new Map<string, Promise<number>>()
+
+async function countPending(userId: string, entityKey?: string): Promise<number> {
+	if (!entityKey) return syncQueueRepository.getCountByUserId(userId)
+	const entries = await syncQueueRepository.getAllByUserId(userId)
+	return entries.filter(entry => entry.entity === entityKey).length
+}
 
 async function flushEntityQueue(
 	entityKey: string,
@@ -75,7 +84,7 @@ export async function flushEntity(
 	const existing = locks.get(lockKey)
 	if (existing) {
 		const synced = await existing
-		const remaining = await syncQueueRepository.getCountByUserId(userId)
+		const remaining = await countPending(userId)
 		return { synced, remaining }
 	}
 
@@ -83,11 +92,11 @@ export async function flushEntity(
 		if (await isOffline()) return 0
 		const entity = getLocalEntity(entityKey)
 		if (options.notify && entity) {
-			startSyncActivity([{ key: entityKey, label: entity.label }])
+			startSyncActivity(await countPending(userId, entityKey))
 		}
 		try {
 			const synced = await flushEntityQueue(entityKey, userId)
-			if (options.notify && entity) setSectionProgress(entityKey, synced)
+			if (options.notify) setSyncProgress(synced)
 			return synced
 		} finally {
 			if (options.notify) finishSyncActivity()
@@ -97,7 +106,7 @@ export async function flushEntity(
 	locks.set(lockKey, task)
 	try {
 		const synced = await task
-		const remaining = await syncQueueRepository.getCountByUserId(userId)
+		const remaining = await countPending(userId)
 		return { synced, remaining }
 	} finally {
 		locks.delete(lockKey)
@@ -110,30 +119,27 @@ export async function flushAll(
 	options: { notify?: boolean } = {}
 ): Promise<SyncResult> {
 	if (await isOffline()) {
-		const remaining = await syncQueueRepository.getCountByUserId(userId)
+		const remaining = await countPending(userId)
 		if (remaining > 0 && options.notify) {
 			showToast("Sin conexión. Se sincronizará al volver online.", "warning")
 		}
 		return { synced: 0, remaining }
 	}
 
-	if (options.notify) {
-		startSyncActivity(
-			LOCAL_ENTITIES.map(entity => ({ key: entity.key, label: entity.label }))
-		)
-	}
+	const total = await countPending(userId)
+	if (options.notify && total > 0) startSyncActivity(total)
 
 	let synced = 0
 	try {
 		for (const entity of LOCAL_ENTITIES) {
 			const result = await flushEntity(entity.key, userId, { notify: false })
 			synced += result.synced
-			if (options.notify) setSectionProgress(entity.key, result.synced)
+			if (options.notify) setSyncProgress(synced)
 		}
 	} finally {
 		if (options.notify) finishSyncActivity()
 	}
 
-	const remaining = await syncQueueRepository.getCountByUserId(userId)
+	const remaining = await countPending(userId)
 	return { synced, remaining }
 }
