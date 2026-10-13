@@ -31,9 +31,7 @@ export default function RegisterScreen() {
 				const result = await register(value.email, value.password)
 				await setSession(result.user.id, result.token)
 				router.replace("/")
-				console.log("RESULT", JSON.stringify(result, null, 2))
 			} catch (e) {
-				console.log("ERROR", JSON.stringify(e, null, 2))
 				setError(
 					e instanceof RegisterError
 						? e.message

@@ -1,3 +1,30 @@
+import { colors, fontSize, radius, spacing } from "@/constants/theme"
+import {
+	DEPILACION_OPTIONS,
+	TRATAMIENTO_OPTIONS,
+	type TratamientoOption,
+} from "@/constants/tratamientos"
+import {
+	defaultTurno,
+	turnoFormValidator,
+	type TurnoFormType,
+	type TurnoType,
+} from "@/db/schema/turnos"
+import {
+	useCreateTurno,
+	useTurnos,
+	useUpdateTurno,
+} from "@/query/hooks/use-turnos"
+import { dateToFecha, fechaToDate } from "@/services/date"
+import {
+	buildTratamiento,
+	checkHoraFormat,
+	checkTurnoInConflict,
+	isTratamientoDepi,
+} from "@/services/form"
+import { formatTurnos } from "@/services/format-turnos"
+import { getHeaderDay } from "@/services/header-day"
+import { useUserId } from "@/session/session-context"
 import DateTimePicker from "@react-native-community/datetimepicker"
 import { useForm } from "@tanstack/react-form"
 import { useState } from "react"
@@ -11,33 +38,6 @@ import {
 	TextInput,
 	View,
 } from "react-native"
-import { colors, fontSize, radius, spacing } from "@/constants/theme"
-import {
-	DEPILACION_OPTIONS,
-	TRATAMIENTO_OPTIONS,
-	type TratamientoOption,
-} from "@/constants/tratamientos"
-import {
-	defaultTurno,
-	type TurnoFormType,
-	type TurnoType,
-	turnoFormValidator,
-} from "@/db/schema/turnos"
-import { useUserId } from "@/session/session-context"
-import {
-	useCreateTurno,
-	useTurnos,
-	useUpdateTurno,
-} from "@/query/hooks/use-turnos"
-import { dateToFecha, fechaToDate } from "@/services/date"
-import { formatTurnos } from "@/services/format-turnos"
-import {
-	buildTratamiento,
-	checkHoraFormat,
-	checkTurnoInConflict,
-	isTratamientoDepi,
-} from "@/services/form"
-import { getHeaderDay } from "@/services/header-day"
 import { ChipMultiSelect, ChipSelect } from "./ChipGroup"
 import { formatFieldErrors } from "./field-error"
 import { InputDuracion } from "./InputDuracion"
@@ -202,12 +202,11 @@ export function TurnoForm({
 						value={fechaToDate(form.state.values.fecha)}
 						mode="date"
 						display={Platform.OS === "ios" ? "inline" : "default"}
-						onChange={(_event, date) => {
+						onValueChange={(_event, date) => {
 							if (Platform.OS === "android") setShowDate(false)
-							if (date) {
-								form.setFieldValue("fecha", dateToFecha(date))
-							}
+							form.setFieldValue("fecha", dateToFecha(date))
 						}}
+						onDismiss={() => setShowDate(false)}
 					/>
 				) : null}
 
@@ -221,7 +220,6 @@ export function TurnoForm({
 									<InputHora
 										value={field.state.value}
 										onChange={field.handleChange}
-										onBlur={field.handleBlur}
 									/>
 									{!field.state.meta.isValid && (
 										<Text style={styles.fieldError}>
@@ -407,7 +405,7 @@ const styles = StyleSheet.create({
 	flex: { flex: 1, backgroundColor: colors.background },
 	content: {
 		padding: spacing.lg,
-		gap: spacing.lg,
+		gap: spacing.xxl,
 	},
 	titleRow: {
 		alignItems: "center",

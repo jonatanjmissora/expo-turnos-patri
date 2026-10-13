@@ -24,7 +24,7 @@ export const colors = {
 	borderSoft: "#999999",
 	/** textos */
 	muted: "#666666",
-	mutedLight: "#888888",
+	mutedLight: "#b9b9b9ff",
 	danger: "#CE1E1E",
 	serverError: "darkred",
 	transparent: "transparent",

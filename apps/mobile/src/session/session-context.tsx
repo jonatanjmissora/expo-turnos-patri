@@ -3,12 +3,14 @@ import {
 	type ReactNode,
 	useContext,
 	useEffect,
+	useRef,
 	useState,
 } from "react"
 import { Alert } from "react-native"
 import { setOnUnauthorized } from "../api/client"
 import { signOut as authSignOut } from "../auth/auth.service"
 import { queryClient } from "../query/query-client"
+import { purgeOldTurnosIfDue } from "../sync/purge"
 import {
 	clearSession,
 	initSession,
@@ -26,31 +28,45 @@ type SessionContextValue = {
 
 const SessionContext = createContext<SessionContextValue | null>(null)
 
+/** Purga local de turnos viejos, en background y silenciosa (best-effort). */
+function purgeInBackground(userId: string | null) {
+	if (!userId) return
+	void purgeOldTurnosIfDue(userId).catch(() => {})
+}
+
 export function SessionProvider({ children }: { children: ReactNode }) {
 	const [activeUserId, setActiveUserId] = useState<string | null>(null)
 	const [isReady, setIsReady] = useState(false)
+	const userIdRef = useRef<string | null>(null)
+
+	const setActiveUserIdState = (userId: string | null) => {
+		userIdRef.current = userId
+		setActiveUserId(userId)
+	}
 
 	useEffect(() => {
 		let active = true
 		;(async () => {
 			const session = await initSession()
 			if (!active) return
-			setActiveUserId(session?.userId ?? null)
+			setActiveUserIdState(session?.userId ?? null)
 			setIsReady(true)
 		})()
 		return () => {
 			active = false
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	// Si un endpoint con sesión responde 401, la sesión expiró: limpiamos y
-	// avisamos. El guard de navegación redirige a /auth/login.
+	// Si un endpoint con sesión responde 401, la sesión expiró: purga local en
+	// background, limpiamos y avisamos. El guard de navegación redirige a login.
 	useEffect(() => {
 		setOnUnauthorized(reason => {
 			void (async () => {
+				purgeInBackground(userIdRef.current)
 				await clearSession()
 				queryClient.clear()
-				setActiveUserId(null)
+				setActiveUserIdState(null)
 
 				Alert.alert(
 					reason === "no_session" ? "No estás conectado" : "Sesión expirada",
@@ -59,18 +75,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 			})()
 		})
 		return () => setOnUnauthorized(null)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const setSession = async (userId: string, token: string | null) => {
 		await persistSession(userId, token)
 		queryClient.clear()
-		setActiveUserId(userId)
+		setActiveUserIdState(userId)
 	}
 
 	const signOut = async () => {
+		const current = activeUserId
 		await authSignOut()
+		purgeInBackground(current)
 		queryClient.clear()
-		setActiveUserId(null)
+		setActiveUserIdState(null)
 	}
 
 	return (

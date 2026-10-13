@@ -12,6 +12,11 @@ export type SyncEntity = {
 	/** Tabla en Neon (ya incluye el prefijo `expo_`). */
 	table: string
 	columns: SyncColumn[]
+	/**
+	 * Config del cron de purga: además de los tombstones (`deleted_at`), borra las
+	 * filas cuya `dateColumn` (TEXT 'YYYY-MM-DD') sea anterior a `olderThanDays`.
+	 */
+	purge?: { dateColumn: string; olderThanDays: number }
 }
 
 /**
@@ -25,6 +30,7 @@ export type SyncEntity = {
 export const SYNC_ENTITIES: Record<string, SyncEntity> = {
 	turnos: {
 		table: "expo_turnos",
+		purge: { dateColumn: "fecha", olderThanDays: 365 },
 		columns: [
 			{ camel: "fecha", snake: "fecha", type: "text" },
 			{ camel: "hora", snake: "hora", type: "text" },

@@ -1,30 +1,28 @@
 export const TRATAMIENTO_OPTIONS = [
-	"maderoterapia",
-	"lifting",
-	"perfilado",
-	"lifting + higiene",
-	"facial profundo",
-	"facial premium",
-	"uñas",
-	"evaluacion",
-	"depilacion",
-	"otro",
+	"servis semipermanente",
+  "servis esculpidas",
+  "esculpidas",
+  "semipermanente",
+  "depilacion",
+  "belleza de pies",
+  "spa de pies",
+  "otro"
 ] as const
 
 export type TratamientoOption = (typeof TRATAMIENTO_OPTIONS)[number]
 
 export const DEPILACION_OPTIONS = [
-	"Pierna Entera",
-	"Media Pierna",
-	"Axila",
-	"Brazos",
-	"Bozo",
-	"Rostro Completo",
-	"Pecho",
-	"Espalda Baja",
-	"Espalda",
-	"Cavado Completo con Tiro",
-	"Cavado Completo sin Tiro",
+	 "Bozo",
+  "Cavado completo",
+  "Bikini",
+  "Piernas",
+  "Brazos",
+  "Rostro",
+  "Menton",
+  "Axilas",
+  "Espalda",
+  "Gluteos",
+  "Abdomen"
 ] as const
 
 export type DepilacionOption = (typeof DEPILACION_OPTIONS)[number]

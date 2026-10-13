@@ -1,6 +1,7 @@
 import { randomUUID } from "expo-crypto"
 import { getDatabase } from "../db/client"
 import { CREATE_TURNOS_TABLE, type TurnoType } from "../db/schema/turnos"
+import { syncQueueRepository } from "./sync-queue.repository"
 
 export type CreateTurnoInput = {
 	userId: string
@@ -88,6 +89,8 @@ export const turnoRepository = {
 			throw new Error("No se pudo recuperar el turno creado")
 		}
 
+		await syncQueueRepository.enqueue(input.userId, "turnos", id, "upsert")
+
 		return mapRow(turno)
 	},
 
@@ -171,6 +174,8 @@ export const turnoRepository = {
 			id
 		)
 
+		await syncQueueRepository.enqueue(turno.userId, "turnos", id, "upsert")
+
 		return turno
 	},
 
@@ -178,6 +183,14 @@ export const turnoRepository = {
 		await initializeTurnosTable()
 
 		const db = await getDatabase()
+		const row = await db.getFirstAsync<{ userId: string }>(
+			`SELECT userId FROM turnos WHERE id = ?`,
+			id
+		)
 		await db.runAsync(`DELETE FROM turnos WHERE id = ?`, id)
+
+		if (row?.userId) {
+			await syncQueueRepository.enqueue(row.userId, "turnos", id, "delete")
+		}
 	},
 }

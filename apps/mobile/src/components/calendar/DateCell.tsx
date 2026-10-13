@@ -8,18 +8,9 @@ type Props = {
 	inMonth: boolean
 	isToday: boolean
 	turnosDelDia: TurnoType[]
-	isExpanded: boolean
-	onToggle: (fecha: string) => void
 }
 
-export function DateCell({
-	fecha,
-	inMonth,
-	isToday,
-	turnosDelDia,
-	isExpanded,
-	onToggle,
-}: Props) {
+export function DateCell({ fecha, inMonth, isToday, turnosDelDia }: Props) {
 	const router = useRouter()
 	const dayNum = String(Number(fecha.split("-")[2]))
 
@@ -29,15 +20,15 @@ export function DateCell({
 	const depiCount = turnosDelDia.filter(t => t.isDepi).length
 
 	const handlePress = () => {
-		if (turnosDelDia.length > 0) onToggle(fecha)
-		else router.push(`/turno/nuevo?fecha=${fecha}`)
+		if (turnosDelDia.length > 0) {
+			router.push({ pathname: "/date/[dateId]", params: { dateId: fecha } })
+		} else {
+			router.push({ pathname: "/turno/nuevo", params: { fecha } })
+		}
 	}
 
 	return (
-		<Pressable
-			onPress={handlePress}
-			style={[styles.cell, isExpanded && styles.cellExpanded]}
-		>
+		<Pressable onPress={handlePress} style={styles.cell}>
 			<View style={[styles.dayNum, isToday && styles.dayNumToday]}>
 				<Text style={styles.dayNumText}>{dayNum}</Text>
 			</View>
@@ -72,9 +63,6 @@ const styles = StyleSheet.create({
 		borderColor: colors.border,
 		borderRadius: radius.md,
 		overflow: "hidden",
-	},
-	cellExpanded: {
-		borderColor: colors.black,
 	},
 	dayNum: {
 		alignSelf: "center",

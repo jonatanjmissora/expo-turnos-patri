@@ -1,7 +1,7 @@
-import { Feather } from "@expo/vector-icons"
-import { Redirect, Tabs } from "expo-router"
 import { colors, fontSize } from "@/constants/theme"
 import { useSession } from "@/session/session-context"
+import { Feather } from "@expo/vector-icons"
+import { Redirect, Tabs } from "expo-router"
 
 export default function TabsLayout() {
 	const { isAuthenticated, isReady } = useSession()

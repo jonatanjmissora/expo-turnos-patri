@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { StyleSheet, Text, View } from "react-native"
 import { colors, fontSize, spacing } from "@/constants/theme"
 import type { TurnosByDate } from "@/services/format-turnos"
@@ -15,12 +14,6 @@ type Props = {
 }
 
 export function CalendarBoard({ weeks, turnos, actualMonth, actualDate }: Props) {
-	const [expandedDate, setExpandedDate] = useState<string | null>(null)
-
-	const handleToggle = (date: string) => {
-		setExpandedDate(prev => (prev === date ? null : date))
-	}
-
 	return (
 		<View style={styles.board}>
 			<View style={styles.weekHeader}>
@@ -37,8 +30,6 @@ export function CalendarBoard({ weeks, turnos, actualMonth, actualDate }: Props)
 					turnos={turnos}
 					actualMonth={actualMonth}
 					actualDate={actualDate}
-					expandedDate={expandedDate}
-					onToggle={handleToggle}
 				/>
 			))}
 		</View>

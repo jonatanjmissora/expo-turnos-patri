@@ -1,5 +1,5 @@
-import { z } from "zod"
 import { TRATAMIENTO_OPTIONS } from "@/constants/tratamientos"
+import { z } from "zod"
 
 export const CREATE_TURNOS_TABLE = `
 	CREATE TABLE IF NOT EXISTS turnos (
@@ -57,7 +57,7 @@ export function defaultTurno(fecha: string): TurnoFormType {
 		hora: "",
 		duracion: 15,
 		nombre: "",
-		tratamiento: "maderoterapia",
+		tratamiento: TRATAMIENTO_OPTIONS[0],
 		depilacion: [],
 		otro: "",
 		valor: "",

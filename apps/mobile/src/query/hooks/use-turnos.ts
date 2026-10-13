@@ -1,8 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {
 	type CreateTurnoInput,
 	turnoRepository,
 } from "@/repositories/turno.repository"
+import { useAfterEntityChange } from "@/sync/use-after-entity-change"
 import { turnosKeys } from "../keys/turnos.keys"
 
 export function useTurnos(userId: string | null | undefined) {
@@ -25,15 +26,15 @@ export function useTurnoById(id: string | undefined) {
 }
 
 export function useCreateTurno() {
-	const queryClient = useQueryClient()
+	const afterChange = useAfterEntityChange(turnosKeys.all)
 	return useMutation({
 		mutationFn: (input: CreateTurnoInput) => turnoRepository.create(input),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: turnosKeys.all }),
+		onSuccess: () => afterChange(),
 	})
 }
 
 export function useUpdateTurno() {
-	const queryClient = useQueryClient()
+	const afterChange = useAfterEntityChange(turnosKeys.all)
 	return useMutation({
 		mutationFn: ({
 			id,
@@ -42,14 +43,14 @@ export function useUpdateTurno() {
 			id: string
 			input: Partial<CreateTurnoInput>
 		}) => turnoRepository.update(id, input),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: turnosKeys.all }),
+		onSuccess: () => afterChange(),
 	})
 }
 
 export function useDeleteTurno() {
-	const queryClient = useQueryClient()
+	const afterChange = useAfterEntityChange(turnosKeys.all)
 	return useMutation({
 		mutationFn: (id: string) => turnoRepository.delete(id),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: turnosKeys.all }),
+		onSuccess: () => afterChange(),
 	})
 }

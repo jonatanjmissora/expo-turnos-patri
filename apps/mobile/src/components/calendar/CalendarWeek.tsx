@@ -4,25 +4,15 @@ import type { TurnoType } from "@/db/schema/turnos"
 import type { TurnosByDate } from "@/services/format-turnos"
 import { formatValor } from "@/services/format-valor"
 import { DateCell } from "./DateCell"
-import { TurnoList } from "./TurnoList"
 
 type Props = {
 	week: string[]
 	turnos: TurnosByDate
 	actualMonth: string
 	actualDate: string
-	expandedDate: string | null
-	onToggle: (date: string) => void
 }
 
-export function CalendarWeek({
-	week,
-	turnos,
-	actualMonth,
-	actualDate,
-	expandedDate,
-	onToggle,
-}: Props) {
+export function CalendarWeek({ week, turnos, actualMonth, actualDate }: Props) {
 	const totalWeek = week.reduce((acc, fecha) => {
 		const totalDia = (turnos[fecha] ?? []).reduce(
 			(sum: number, turno: TurnoType) => sum + turno.valor,
@@ -30,9 +20,6 @@ export function CalendarWeek({
 		)
 		return acc + totalDia
 	}, 0)
-
-	const expandedInWeek =
-		expandedDate && week.includes(expandedDate) ? expandedDate : null
 
 	return (
 		<View>
@@ -44,19 +31,9 @@ export function CalendarWeek({
 						inMonth={fecha.split("-")[1] === actualMonth}
 						isToday={fecha === actualDate}
 						turnosDelDia={turnos[fecha] ?? []}
-						isExpanded={expandedDate === fecha}
-						onToggle={onToggle}
 					/>
 				))}
 			</View>
-
-			{expandedInWeek ? (
-				<TurnoList
-					fecha={expandedInWeek}
-					turnosDelDia={turnos[expandedInWeek] ?? []}
-					onClose={() => onToggle(expandedInWeek)}
-				/>
-			) : null}
 
 			<Text style={styles.totalWeek}>Total $ {formatValor(totalWeek)}</Text>
 		</View>

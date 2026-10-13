@@ -1,0 +1,6 @@
+export const CREATE_APP_META_TABLE = `
+	CREATE TABLE IF NOT EXISTS app_meta (
+		key   TEXT PRIMARY KEY NOT NULL,
+		value TEXT NOT NULL
+	);
+`

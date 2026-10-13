@@ -88,7 +88,6 @@ export default function LoginScreen() {
 								value={field.state.value}
 								onChangeText={field.handleChange}
 								onBlur={field.handleBlur}
-								secureTextEntry
 								placeholder="contraseña"
 								placeholderTextColor={colors.mutedLight}
 								style={styles.input}

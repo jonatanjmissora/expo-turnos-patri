@@ -8,9 +8,6 @@ import {
 	getEntity,
 } from "../../lib/sync-entities.js"
 
-/** Retención de tombstones (días) para el cron. */
-const RETENTION_DAYS = 30
-
 type Sql = ReturnType<typeof getSql>
 
 function isCron(req: VercelRequest): boolean {
@@ -23,19 +20,29 @@ function getEntityName(req: VercelRequest): string {
 	return Array.isArray(value) ? (value[0] ?? "") : (value ?? "")
 }
 
+/**
+ * Purga de una entidad: borra los tombstones (`deleted_at`) y, si la entidad
+ * declara `purge`, las filas con `dateColumn` anterior a `olderThanDays`.
+ */
+async function purgeEntity(sql: Sql, entity: SyncEntity): Promise<number> {
+	let where = "deleted_at IS NOT NULL"
+	const params: unknown[] = []
+	if (entity.purge) {
+		where = `(deleted_at IS NOT NULL OR ${entity.purge.dateColumn} < ((now() - make_interval(days => $1))::date)::text)`
+		params.push(entity.purge.olderThanDays)
+	}
+
+	const rows = (await sql(
+		`DELETE FROM ${entity.table} WHERE ${where} RETURNING id`,
+		params
+	)) as { id: string }[]
+	return rows.length
+}
+
 async function purgeTombstones(sql: Sql): Promise<number> {
 	let purged = 0
 	for (const entity of Object.values(SYNC_ENTITIES)) {
-		const rows = (await sql(
-			`
-				DELETE FROM ${entity.table}
-				WHERE deleted_at IS NOT NULL
-				  AND deleted_at < now() - make_interval(days => $1)
-				RETURNING id
-			`,
-			[RETENTION_DAYS]
-		)) as { id: string }[]
-		purged += rows.length
+		purged += await purgeEntity(sql, entity)
 	}
 	return purged
 }
