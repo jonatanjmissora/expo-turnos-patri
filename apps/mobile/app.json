@@ -2,6 +2,7 @@
   "expo": {
     "name": "Turnos Patri",
     "slug": "turnos-patri",
+    "owner": "katodev",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -40,6 +41,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "42ae180e-cb0d-4b7b-b8a6-d8e46354582d"
+      }
     }
   }
 }

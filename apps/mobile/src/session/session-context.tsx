@@ -11,6 +11,7 @@ import { setOnUnauthorized } from "../api/client"
 import { signOut as authSignOut } from "../auth/auth.service"
 import { queryClient } from "../query/query-client"
 import { purgeOldTurnosIfDue } from "../sync/purge"
+import { pullMergeSilent } from "../sync/restore"
 import {
 	clearSession,
 	initSession,
@@ -82,6 +83,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 		await persistSession(userId, token)
 		queryClient.clear()
 		setActiveUserIdState(userId)
+
+		// Pull silencioso al loguear: trae y mergea (LWW) lo que haya en la nube
+		// (p. ej. datos importados desde afuera), sin interrumpir al usuario.
+		// Se invalida el caché SIEMPRE (aunque falle), para que la UI use lo local.
+		void (async () => {
+			try {
+				await pullMergeSilent(userId)
+			} catch {
+				// best-effort; se reintenta en el próximo login
+			} finally {
+				await queryClient.invalidateQueries()
+			}
+		})()
 	}
 
 	const signOut = async () => {

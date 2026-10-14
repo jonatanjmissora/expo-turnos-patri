@@ -148,6 +148,25 @@ async function mergeEntityLocally(
 }
 
 /**
+ * Pull silencioso: baja la nube y mergea (LWW) con lo local, **sin prompts**.
+ * Se usa al loguear para traer datos que se agregaron en la nube desde afuera
+ * (p. ej. una migración hecha manualmente). Encola lo local más nuevo.
+ */
+export async function pullMergeSilent(userId: string): Promise<void> {
+	for (const entity of LOCAL_ENTITIES) {
+		const remote = await apiSyncList<CloudItem>(entity.key)
+		const local = await syncLocalRepository.getAll(entity.key, userId)
+		await mergeEntityLocally(
+			entity,
+			userId,
+			remote.items,
+			remote.deletedIds,
+			local
+		)
+	}
+}
+
+/**
  * Restore/merge: se corre una vez por instalación, tras loguear. Decide el
  * estado global (4 combinaciones) y aplica la política elegida por el usuario.
  * Muestra la barra de sync (indeterminada) mientras trae/aplica datos.
