@@ -5,11 +5,10 @@
     "owner": "katodev",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "turnospatri",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.turnospatri.app",
       "supportsTablet": true
     },
@@ -17,15 +16,15 @@
       "package": "com.turnospatri.app",
       "adaptiveIcon": {
         "backgroundColor": "#F9D9DE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/app-adaptive-foreground.png",
+        "backgroundImage": "./assets/images/app-adaptive-background.png",
+        "monochromeImage": "./assets/images/app-adaptive-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/app-favicon.png"
     },
     "plugins": [
       "expo-router",
@@ -33,8 +32,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#F9D9DE",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "image": "./assets/images/app-splash.png",
+          "imageWidth": 200
         }
       ]
     ],
